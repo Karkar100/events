@@ -30,13 +30,9 @@ class EventCollectionViewController: UICollectionViewController, EventCollection
         monitor.start(queue: queue)
         title = "События в Москве"
         let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(repeatRequest(_:)))
-        let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(increaseCollection(_:)))
-        swipeUp.direction = .up
         swipeDown.direction = .down
-        swipeUp.numberOfTouchesRequired = 1
         swipeDown.numberOfTouchesRequired = 1
         view.addGestureRecognizer(swipeDown)
-        view.addGestureRecognizer(swipeUp)
         self.collectionView.register(EventCollectionViewCell.self, forCellWithReuseIdentifier: EventCollectionViewCell.reuseId)
         self.collectionView.backgroundColor = .white
         self.collectionView.contentInsetAdjustmentBehavior = .always
@@ -50,7 +46,6 @@ class EventCollectionViewController: UICollectionViewController, EventCollection
         self.collectionView.dataSource = self.presenter
         self.collectionView.delegate = self.presenter
         self.collectionView.isUserInteractionEnabled = true
-        self.collectionView.addGestureRecognizer(swipeUp)
         self.collectionView.addGestureRecognizer(swipeDown)
         // Do any additional setup after loading the view.
     }
@@ -80,7 +75,7 @@ class EventCollectionViewController: UICollectionViewController, EventCollection
             self.present(alert, animated: true, completion: nil)
         }
     }
-    @objc func increaseCollection(_ sender: UISwipeGestureRecognizer){
+    func increaseCollection(){
         DispatchQueue.main.async {
             self.view.addSubview(self.bottomActivity)
             self.bottomActivity.translatesAutoresizingMaskIntoConstraints = false

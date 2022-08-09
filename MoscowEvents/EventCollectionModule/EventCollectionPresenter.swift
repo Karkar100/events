@@ -12,6 +12,7 @@ protocol EventCollectionViewProtocol: class {
     func reload()
     func requestFailure(error: Error)
     func noInternet()
+    func increaseCollection()
     func countCellWidth()->CGFloat
 }
 
@@ -27,6 +28,7 @@ class EventCollectionPresenter: NSObject, EventCollectionPresenterProtocol{
     var eventCollection = EventCollectionModel(count: 0, next: "", previous: "", results: [])
     var thumbnails: [UIImage] = []
     var reuseIdentifier = "EventCell"
+    var isWaiting: Bool = true
     required init (view: EventCollectionViewProtocol, networkService: NetworkServiceProtocol, router: RouterProtocol) {
         self.view = view
         self.networkService = networkService
@@ -54,6 +56,7 @@ class EventCollectionPresenter: NSObject, EventCollectionPresenterProtocol{
             }
             eventCollection.next = requestResp?.next ?? ""
             self.view?.reload()
+            self.isWaiting = false
         }
     }
     func downloadThumbnail(string: String) async throws {
@@ -112,6 +115,12 @@ extension EventCollectionPresenter: UICollectionViewDelegate{
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let string = String((eventCollection.results[indexPath.row].id)) as? String else { return }
         openEventScreen(string: string)
+    }
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if indexPath.row == self.eventCollection.results.count-1 && !isWaiting{
+            isWaiting = true
+            view?.increaseCollection()
+        }
     }
 }
 extension EventCollectionPresenter: UICollectionViewDelegateFlowLayout {
